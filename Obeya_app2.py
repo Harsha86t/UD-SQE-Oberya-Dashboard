@@ -661,43 +661,37 @@ def render_board(issues: List[Issue], visible_weeks: List[str]):
         elif i.week_num < min_visible_num:
              board_data[i.brand]["PENDING"].append(i)
 
-    # ORDER: [Weeks] -> Pending -> Closed
+    # Construct headers without leading spaces
     headers_html = ['<th class="obeya-th sticky-col">MODELS</th>']
-    
-    # Weekly Columns
     for w in visible_weeks:
         headers_html.append(f'<th class="obeya-th">{w}</th>')
-
-    # Pending & Closed
-    headers_html.append('<th class="obeya-th pending">PENDING<br><span style="font-size:0.8rem">Backlog</span></th>')
-    headers_html.append('<th class="obeya-th closed">CLOSED<br><span style="font-size:0.8rem">Archive</span></th>')
+    headers_html.append('<th class="obeya-th pending">PENDING</th>')
+    headers_html.append('<th class="obeya-th closed">CLOSED</th>')
 
     rows_html = []
     for brand in BRANDS_DEFAULT:
         cells = [f'<td class="obeya-rowhead">{brand}</td>']
-        
-        # Weekly
         for w in visible_weeks:
             cells.append(render_cell(board_data[brand][w], ""))
-            
-        # Pending
         cells.append(render_cell(board_data[brand]["PENDING"], "bg-amber"))
-        
-        # Closed
         cells.append(render_cell(board_data[brand]["CLOSED"], "bg-green"))
-
         rows_html.append(f'<tr>{"".join(cells)}</tr>')
 
-    table_html = f"""
-    <div class="board-container">
-        <table class="obeya-table">
-            <thead><tr>{"".join(headers_html)}</tr></thead>
-            <tbody>{"".join(rows_html)}</tbody>
-        </table>
-    </div>
-    """
+    # IMPORTANT: Use a join without newlines and spaces to prevent Markdown code-block triggers
+    table_content = "".join(rows_html)
+    header_content = "".join(headers_html)
+    
+    # We build the string flat to ensure no line starts with spaces
+    table_html = (
+        '<div class="board-container">'
+        '<table class="obeya-table">'
+        f'<thead><tr>{header_content}</tr></thead>'
+        f'<tbody>{table_content}</tbody>'
+        '</table>'
+        '</div>'
+    )
+    
     st.markdown(table_html, unsafe_allow_html=True)
-
 def render_cell(issues: List[Issue], bg_class: str) -> str:
     count = len(issues)
     grid_class = "grid-3" if count > 4 else "grid-2"
