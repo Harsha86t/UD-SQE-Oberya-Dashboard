@@ -699,24 +699,15 @@ def render_cell(issues: List[Issue], bg_class: str) -> str:
     chips_html = []
     for issue in issues:
         # Tooltip content
-        # SQE Name added
         display_name = issue.sqe_name if issue.sqe_name else issue.owner_initials
         tooltip_content = f"<b>SQE: {display_name}</b><br/>Supplier: {issue.supplier_sqa or 'NA'}<br/>{issue.issue_info}"
         safe_initials = html_escape(issue.owner_initials)
 
         # Custom Tooltip Structure: div.tooltip-container > a.chip > span.tooltip-text
-        chip = f"""
-        <div class="tooltip-container">
-            <a class="chip {chip_bg_class(issue)}" href="?issue_id={issue.id}" target="_self">
-                {safe_initials}
-                <span class="dot {dot_class(issue.action_health)}"></span>
-            </a>
-            <span class="tooltip-text">{tooltip_content}</span>
-        </div>
-        """
+        chip = f"""<div class="tooltip-container"><a class="chip {chip_bg_class(issue)}" href="?issue_id={issue.id}" target="_self">{safe_initials}<span class="dot {dot_class(issue.action_health)}"></span></a><span class="tooltip-text">{tooltip_content}</span></div>"""
         chips_html.append(chip)
     
-    inner_html = f'<div class="cell-grid {grid_class}">{"".join(chips_html)}</div>'
+    inner_html = f'<div class="cell-grid {grid_class}'>{"".join(chips_html)}</div>'
     return f'<td class="obeya-td {bg_class}">{inner_html}</td>'
 
 # CHECK FOR DIALOG AVAILABILITY
